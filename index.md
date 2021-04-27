@@ -1,37 +1,51 @@
-## Welcome to GitHub Pages
+__Team Project__
 
-You can use the [editor on GitHub](https://github.com/akafounis/bundle-adjustment/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+The project’s goal is to show a sample application of Bundle Adjustment in reconstructing 3D
+scenes, and it involves three major steps of key features finding and matching, geometric estimation, and recovering the 3D structure of the scene using bundle adjustment. Furthermore, we are going to explore several implementations of different stages of the pipeline of bundle
+adjustment using the [**BAL Dataset**](https://grail.cs.washington.edu/projects/bal/).
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+![alt text](Pipeline.jpg)
 
-### Markdown
+**Finding correspondences between images**
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+For computing key points and their descriptors, images are converted to gray scale, then we
+utilized three different methods: Scale Invariant Feature Transform (SIFT), SuperPoint which is a self-supervised learning model for interest point detection and description, and
+Features from Accelerated Segment Test (FAST). Experiments show, that FAST finds
+the most correspondences and therefore, we further used it in the bundle adjustment. The
+computation of the feature descriptors is done with SIFT. The feature matching between two
+images is done by identifying their first and also their second nearest neighbours (see Fig. 5a).
+The latter helps for removing ambiguous correspondences by applying Lowe’s ratio test (see Fig.
+5b) with a threshold R = 0.7. The matches still contain outliers which can harm the optimization
+problem. Therefore, we use Random Sample Consensus (RANSAC) to find outliers and discard
+them (see Fig. 3c). For implementing these algorithms, we used the OpenCV library.
 
-```markdown
-Syntax highlighted code block
+**Constructing the Optimization Problem**
 
-# Header 1
-## Header 2
-### Header 3
+After initialization of rotation, translation and valid tracks of matching keypoints across multiple images, Bundle Adjustment optimization can be constructed. Optimization problem is
+formulated as a non-linear least squares problem. Cost function is defined as the error between
+the back-projected 3D point and the observed point on the image plane. By minimizing the cost
+function the aim is to recover camera parameters and 3D positions of the keypoints.
 
-- Bulleted
-- List
+To solve the minimization problem, Ceres library is used. We solved the formulation with
+Levenberg Marquardt Algorithm and used Dense Schur solver to leverage from the special structure that the Jacobian matrix of the re-projection error has.
 
-1. Numbered
-2. List
+**Experiment and Analysis**
 
-**Bold** and _Italic_ and `Code` text
+![alt text](SuperPoint-FAST.jpg)
 
-[Link](url) and ![Image](src)
-```
+In the above pictures we see a comparison between the three keypoint extraction techniques
+that we used. The most efficient in tracking keypoints is the FAST. FAST tracked almost
+double as many keypoints as SIFT did. Superpoint, the deep learning based keypoint extractor,
+managed to track approximately 641 keypoints in average between two frames. This made it
+less practical than SIFT and FAST, so we proceeded with the other two approaches.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
+**Obtained Optimized 3D Points**
+![alt text](Result.jpg)
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/akafounis/bundle-adjustment/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
-### Support or Contact
+On the picture above we can see the resulting 3D points that we got after the optimization
+(red) as opposed to their location before the optimization (green). The resulting 3D Points for
+the BAL dataset are almost applied with the ground truth.
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+This project was developed using **C++**.
