@@ -19,6 +19,9 @@ The latter helps for removing ambiguous correspondences by applying Lowe’s rat
 problem. Therefore, we use Random Sample Consensus (RANSAC) to find outliers and discard
 them (see Fig. 3c). For implementing these algorithms, we used the OpenCV library.
 
+![alt text](Correspondence.jpg)
+
+
 **Constructing the Optimization Problem**
 
 After initialization of rotation, translation and valid tracks of matching keypoints across multiple images, Bundle Adjustment optimization can be constructed. Optimization problem is
