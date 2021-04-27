@@ -1,5 +1,7 @@
 __Team Project__
 
+![alt text](BA_1.jpg)
+
 The project’s goal is to show a sample application of Bundle Adjustment in reconstructing 3D
 scenes, and it involves three major steps of key features finding and matching, geometric estimation, and recovering the 3D structure of the scene using bundle adjustment. Furthermore, we are going to explore several implementations of different stages of the pipeline of bundle
 adjustment using the [**BAL Dataset**](https://grail.cs.washington.edu/projects/bal/).
